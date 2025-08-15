@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { envs } from './config';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { Logger, RequestMethod, ValidationPipe } from '@nestjs/common';
 import { RpcCustomExceptionFilter } from './common/exceptions/rpc-custom-exception.filter';
 
 async function bootstrap() {
@@ -9,7 +9,14 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
 
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix('api', {
+    exclude: [
+      {
+        path: '',
+        method: RequestMethod.GET,
+      },
+    ],
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -22,7 +29,7 @@ async function bootstrap() {
 
   await app.listen(envs.port);
 
-  console.log('Hla Mundo - primer cambio')
+  console.log('Hla Mundo - primer cambio');
 
   logger.log(`Gateway running on Port: ${envs.port}`);
 }
